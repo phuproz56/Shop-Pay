@@ -9,6 +9,7 @@ import Link from "next/link";
 import { BiLeftArrowAlt } from "react-icons/bi";
 import LoginInput from "@/components/inputs/loginInput/index";
 import { useState } from "react";
+import CircledIconBtn from "@/components/buttons/circledIconBtn";
 const initialvalues = {
   login_email: "",
   login_password: "",
@@ -69,6 +70,10 @@ export default function signin({ country }) {
                     placeholder="Password"
                     onChange={handleChange}
                   />
+                  <CircledIconBtn type="submit" text="Sign in"/>
+                  <div className={styles.forgot}>
+                    <Link href="/forget">Forgot password ?</Link>
+                  </div>
                 </Form>
               )}
             </Formik>
