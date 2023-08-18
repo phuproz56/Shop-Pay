@@ -6,10 +6,12 @@ import {BsSuitHeart} from 'react-icons/bs';
 import {RiAccountPinCircleLine, RiArrowDropDownFill} from 'react-icons/ri';
 import { useState } from "react";
 import UserMenu from "./UserMenu";
+import { useSession } from "next-auth/react";
 
 
 export default function Top({ country }) {
-    const [loggedIn, setLoggedIn] = useState(true);
+    const { data: session } = useSession();
+    // const [loggedIn, setLoggedIn] = useState(true);
     const [visible, setvisible] = useState(false);
   return (
     <div className={styles.top}>
@@ -45,11 +47,12 @@ export default function Top({ country }) {
             onMouseLeave={() => setvisible(false)}
             >
                 {
-                    loggedIn ? (
+                    session ? (
                         <li  className={styles.li}>
                     <div className={styles.flex}>
-                        <img src="https://th.bing.com/th/id/R.c11b6f38dffc24a4508217513b0e50bd?rik=Pt%2bkITlukiMkWg&riu=http%3a%2f%2fwww.emmegi.co.uk%2fwp-content%2fuploads%2f2019%2f01%2fUser-Icon.jpg&ehk=zjS04fF4nxx%2bpkvRPsSezyic3Z7Yfu%2fuoT75KnbNv1Y%3d&risl=&pid=ImgRaw&r=0" alt=""></img>
-                        <span>Phu</span>
+                        {/* <img src="https://th.bing.com/th/id/R.c11b6f38dffc24a4508217513b0e50bd?rik=Pt%2bkITlukiMkWg&riu=http%3a%2f%2fwww.emmegi.co.uk%2fwp-content%2fuploads%2f2019%2f01%2fUser-Icon.jpg&ehk=zjS04fF4nxx%2bpkvRPsSezyic3Z7Yfu%2fuoT75KnbNv1Y%3d&risl=&pid=ImgRaw&r=0" alt=""></img> */}
+                        <img src={session.user.image} alt=""></img>
+                        <span>{session.user.name}</span>
                         <RiArrowDropDownFill />
                     </div>
                 </li>
@@ -64,7 +67,7 @@ export default function Top({ country }) {
                 </li>
                 )}
                 {
-                    visible && <UserMenu loggedIn={loggedIn}/>
+                    visible && <UserMenu session={session}/>
                 }
             </li>
         </ul>
