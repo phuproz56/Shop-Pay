@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-key */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/no-unescaped-entities */
 import Footer from "@/components/footer";
@@ -10,11 +11,13 @@ import { BiLeftArrowAlt } from "react-icons/bi";
 import LoginInput from "@/components/inputs/loginInput/index";
 import { useState } from "react";
 import CircledIconBtn from "@/components/buttons/circledIconBtn";
+import { getProviders, signIn } from "next-auth/react";
 const initialvalues = {
   login_email: "",
   login_password: "",
 };
-export default function signin({ country }) {
+export default function signin({ providers }) {
+  console.log(providers);
   const [user, setUser] = useState(initialvalues);
   const { login_email, login_password } = user;
   const handleChange = (e) => {
@@ -70,17 +73,40 @@ export default function signin({ country }) {
                     placeholder="Password"
                     onChange={handleChange}
                   />
-                  <CircledIconBtn type="submit" text="Sign in"/>
+                  <CircledIconBtn type="submit" text="Sign in" />
                   <div className={styles.forgot}>
                     <Link href="/forget">Forgot password ?</Link>
                   </div>
                 </Form>
               )}
             </Formik>
+            <div className={styles.login__socials}>
+              <span className={styles.or}>Or continue with</span>
+              <div className={styles.login__socials_wrap}>
+                {providers.map((provider) => (
+                  <div key={provider.name}>
+                    <button
+                      className={styles.socials__btn}
+                      onClick={() => signIn(provider.id)}
+                    >
+                      <img src={`../../images/icons/${provider.name}.png`} alt="" />
+                      Sign in with {provider.name}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
       <Footer country="Viet Nam" />
     </>
   );
+}
+
+export async function getServerSideProps(context) {
+  const providers = Object.values(await getProviders());
+  return {
+    props: { providers },
+  };
 }
