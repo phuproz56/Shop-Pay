@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react/jsx-key */
 /* eslint-disable react-hooks/rules-of-hooks */
 /* eslint-disable react/no-unescaped-entities */
@@ -15,22 +16,43 @@ import { getProviders, signIn } from "next-auth/react";
 const initialvalues = {
   login_email: "",
   login_password: "",
+  name: "",
+  email: "",
+  password: "",
+  conf_password: "",
 };
 export default function signin({ providers }) {
   console.log(providers);
   const [user, setUser] = useState(initialvalues);
-  const { login_email, login_password } = user;
+  const {
+    login_email,
+    login_password,
+    name,
+    email,
+    password,
+    conf_password,
+  } = user;
   const handleChange = (e) => {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value });
   };
-  console.log(user);
   const loginValidation = Yup.object({
     login_email: Yup.string()
-      .required("Email address is required.")
-      .email("Please enter a valid email address."),
-    login_password: Yup.string().required("Please enter a password."),
+      .required("Địa chỉ Email là bắt buộc.")
+      .email("Vui lòng nhập một địa chỉ email hợp lệ."),
+    login_password: Yup.string().required("Vui lòng nhập Password."),
   });
+
+  const registerValidation = Yup.object({
+    name: Yup.string().required('Tên bạn là gì ?')
+    .min(2,'Tên phải gồm 2 đến 32 kí tự.')
+    .max(32, 'Tên phải gồm 2 đến 32 kí tự.')
+    .matches(/^[aA-zZ]/, 'Số và ký tự đặc biệt không được phép'),
+    email: Yup.string().required('Bạn sẽ cần điều này khi đăng nhập và nếu bạn cần đặt lại mật khẩu của mình.').email("Nhập địa chỉ email hợp lệ"),
+    password: Yup.string().required('Nhập tổ hợp của ít nhất sáu số, chữ cái và dấu chấm câu (chẳng hạn như ! và &).').
+    min(6, 'Password cần ít nhất 6 ký tự.').max(36, 'Password không thể nhiều hơn 36 kí tự.'),
+    conf_password: Yup.string().required('Nhập lại Password của bạn.').oneOf([Yup.ref("password")], "Password không phù hợp."),
+  })
   return (
     <>
       <Header country />
@@ -89,13 +111,68 @@ export default function signin({ providers }) {
                       className={styles.socials__btn}
                       onClick={() => signIn(provider.id)}
                     >
-                      <img src={`../../images/icons/${provider.name}.png`} alt="" />
+                      <img
+                        src={`../../images/icons/${provider.name}.png`}
+                        alt=""
+                      />
                       Sign in with {provider.name}
                     </button>
                   </div>
                 ))}
               </div>
             </div>
+          </div>
+        </div>
+        <div className={styles.login__container}>
+          <div className={styles.login__form}>
+            <h1>Sign up</h1>
+            <p>
+              Get access to one of the best Eshopping services in the world.
+            </p>
+            <Formik
+              enableReinitialize
+              initialValues={{
+                name,
+                email,
+                password,
+                conf_password,
+              }}
+              validationSchema={registerValidation}
+            >
+              {(form) => (
+                <Form>
+                  <LoginInput
+                    type="text"
+                    name="name"
+                    icon="user"
+                    placeholder="Full Name"
+                    onChange={handleChange}
+                  />
+                  <LoginInput
+                    type="text"
+                    name="email"
+                    icon="email"
+                    placeholder="Email Address"
+                    onChange={handleChange}
+                  />
+                  <LoginInput
+                    type="password"
+                    name="password"
+                    icon="password"
+                    placeholder="Password"
+                    onChange={handleChange}
+                  />
+                  <LoginInput
+                    type="password"
+                    name="conf_password"
+                    icon="password"
+                    placeholder="Re-Type Password"
+                    onChange={handleChange}
+                  />
+                  <CircledIconBtn type="submit" text="Sign up" />
+                </Form>
+              )}
+            </Formik>
           </div>
         </div>
       </div>
