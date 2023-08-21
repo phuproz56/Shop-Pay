@@ -13,6 +13,7 @@ import LoginInput from "@/components/inputs/loginInput/index";
 import { useState } from "react";
 import CircledIconBtn from "@/components/buttons/circledIconBtn";
 import { getProviders, signIn } from "next-auth/react";
+import axios from 'axios';
 const initialvalues = {
   login_email: "",
   login_password: "",
@@ -20,9 +21,11 @@ const initialvalues = {
   email: "",
   password: "",
   conf_password: "",
+  success: "",
+  error: "",
 };
 export default function signin({ providers }) {
-  console.log(providers);
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(initialvalues);
   const {
     login_email,
@@ -31,6 +34,8 @@ export default function signin({ providers }) {
     email,
     password,
     conf_password,
+    success,
+    error,
   } = user;
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -44,15 +49,42 @@ export default function signin({ providers }) {
   });
 
   const registerValidation = Yup.object({
-    name: Yup.string().required('Tên bạn là gì ?')
-    .min(2,'Tên phải gồm 2 đến 32 kí tự.')
-    .max(32, 'Tên phải gồm 2 đến 32 kí tự.')
-    .matches(/^[aA-zZ]/, 'Số và ký tự đặc biệt không được phép'),
-    email: Yup.string().required('Bạn sẽ cần điều này khi đăng nhập và nếu bạn cần đặt lại mật khẩu của mình.').email("Nhập địa chỉ email hợp lệ"),
-    password: Yup.string().required('Nhập tổ hợp của ít nhất sáu số, chữ cái và dấu chấm câu (chẳng hạn như ! và &).').
-    min(6, 'Password cần ít nhất 6 ký tự.').max(36, 'Password không thể nhiều hơn 36 kí tự.'),
-    conf_password: Yup.string().required('Nhập lại Password của bạn.').oneOf([Yup.ref("password")], "Password không phù hợp."),
-  })
+    name: Yup.string()
+      .required("Tên bạn là gì ?")
+      .min(2, "Tên phải gồm 2 đến 32 kí tự.")
+      .max(32, "Tên phải gồm 2 đến 32 kí tự.")
+      .matches(/^[aA-zZ]/, "Số và ký tự đặc biệt không được phép"),
+    email: Yup.string()
+      .required(
+        "Bạn sẽ cần điều này khi đăng nhập và nếu bạn cần đặt lại mật khẩu của mình."
+      )
+      .email("Nhập địa chỉ email hợp lệ"),
+    password: Yup.string()
+      .required(
+        "Nhập tổ hợp của ít nhất sáu số, chữ cái và dấu chấm câu (chẳng hạn như ! và &)."
+      )
+      .min(6, "Password cần ít nhất 6 ký tự.")
+      .max(36, "Password không thể nhiều hơn 36 kí tự."),
+    conf_password: Yup.string()
+      .required("Nhập lại Password của bạn.")
+      .oneOf([Yup.ref("password")], "Password không phù hợp."),
+  });
+  const signUpHandler = async () => {
+    try {
+      setLoading(true);
+      const { data } = await axios.post("/api/auth/signup", {
+        name,
+        email,
+        password,
+      });
+      setUser({ ...user, error: "", success: data.message });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      setUser({ ...user, success: "", error: error.response.data.message });
+    }
+  };
+
   return (
     <>
       <Header country />
@@ -138,6 +170,9 @@ export default function signin({ providers }) {
                 conf_password,
               }}
               validationSchema={registerValidation}
+              onSubmit={() => {
+                signUpHandler();
+              }}
             >
               {(form) => (
                 <Form>
@@ -173,6 +208,8 @@ export default function signin({ providers }) {
                 </Form>
               )}
             </Formik>
+            <div>{success && <span>{success}</span>}</div>
+            <div>{error && <span>{error}</span>}</div>
           </div>
         </div>
       </div>
