@@ -13,7 +13,10 @@ import LoginInput from "@/components/inputs/loginInput/index";
 import { useState } from "react";
 import CircledIconBtn from "@/components/buttons/circledIconBtn";
 import { getProviders, signIn } from "next-auth/react";
-import axios from 'axios';
+import axios from "axios";
+import DotLoaderSpinner from "@/components/loaders/dotLoader";
+import Router from "next/router";
+
 const initialvalues = {
   login_email: "",
   login_password: "",
@@ -79,6 +82,9 @@ export default function signin({ providers }) {
       });
       setUser({ ...user, error: "", success: data.message });
       setLoading(false);
+      setTimeout(() => {
+        Router.push("/");
+      }, 2000)
     } catch (error) {
       setLoading(false);
       setUser({ ...user, success: "", error: error.response.data.message });
@@ -87,6 +93,9 @@ export default function signin({ providers }) {
 
   return (
     <>
+    {
+      loading && <DotLoaderSpinner loading={loading} />
+    }
       <Header country />
       <div className={styles.login}>
         <div className={styles.login__container}>
@@ -95,14 +104,13 @@ export default function signin({ providers }) {
               <BiLeftArrowAlt />
             </div>
             <span>
-              We'd be happy to join us ! <Link href="/">Go store</Link>
+              Chúng tôi rất vui khi bạn được tham gia cùng chúng tôi !{" "}
+              <Link href="/">Go store</Link>
             </span>
           </div>
           <div className={styles.login__form}>
             <h1>Sign in</h1>
-            <p>
-              Get access to one of the best Eshopping services in the world.
-            </p>
+            <p>Chào mừng đến với website E-commerce lớn nhất cả nước.</p>
             <Formik
               enableReinitialize
               initialValues={{
@@ -158,9 +166,7 @@ export default function signin({ providers }) {
         <div className={styles.login__container}>
           <div className={styles.login__form}>
             <h1>Sign up</h1>
-            <p>
-              Get access to one of the best Eshopping services in the world.
-            </p>
+            <p>Chào mừng đến với website E-commerce lớn nhất cả nước.</p>
             <Formik
               enableReinitialize
               initialValues={{
@@ -208,8 +214,8 @@ export default function signin({ providers }) {
                 </Form>
               )}
             </Formik>
-            <div>{success && <span>{success}</span>}</div>
-            <div>{error && <span>{error}</span>}</div>
+            <div>{success && <span className={styles.success}>{success}</span>}</div>
+            <div>{error && <span className={styles.error}>{error}</span>}</div>
           </div>
         </div>
       </div>

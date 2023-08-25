@@ -75,7 +75,7 @@ export const activateEmailTemplate = (to, url) => {
   <td class="es-m-p0r" valign="top" align="center" style="padding:0;Margin:0;width:660px">
   <table cellpadding="0" cellspacing="0" width="100%" role="presentation" style="mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px">
   <tr>
-  <td align="center" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://shoppay.com" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#134F5C;font-size:14px"><img class="adapt-img" src="https://wqqdng.stripocdn.email/content/guids/CABINET_c1dcb82c88b8c23f88cd2cc2e86dbb4e/images/logo.png" alt="SHoppay" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" height="34" title="SHoppay"></a></td>
+  <td align="center" style="padding:0;Margin:0;font-size:0px"><a target="_blank" href="https://shoppay.com" style="-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;text-decoration:underline;color:#134F5C;font-size:14px"><img class="adapt-img" src="https://xwkvbf.stripocdn.email/content/guids/CABINET_3a96fa64b04e3cacc2a7555992d7c6770c3c2322071a262d393149f19ff6d7b3/images/vnshop1.jpg" alt="SHoppay" style="display:block;border:0;outline:none;text-decoration:none;-ms-interpolation-mode:bicubic" height="34" title="SHoppay"></a></td>
   </tr>
   <tr>
   <td align="center" style="padding:0;Margin:0;padding-top:10px;padding-bottom:10px;font-size:0">
