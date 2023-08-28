@@ -7,14 +7,17 @@ import { SessionProvider } from "next-auth/react";
 import Head from "next/head";
 let persistor = persistStore(store);
 
-export default function App({ Component, pageProps: { session, ...pageProps } }) {
+export default function App({
+  Component,
+  pageProps: { session, ...pageProps },
+}) {
   return (
     <>
       <Head>
-        <title>Shop Pay</title>
+        <title>Shop VN</title>
         <meta
           name="description"
-          content="Shop Pay online shoping service for all of your needs."
+          content="Shop VN online shoping service for all of your needs."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />

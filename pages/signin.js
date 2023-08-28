@@ -12,7 +12,12 @@ import { BiLeftArrowAlt } from "react-icons/bi";
 import LoginInput from "@/components/inputs/loginInput/index";
 import { useState } from "react";
 import CircledIconBtn from "@/components/buttons/circledIconBtn";
-import { getProviders, signIn } from "next-auth/react";
+import {
+  getCsrfToken,
+  getProviders,
+  getSession,
+  signIn,
+} from "next-auth/react";
 import axios from "axios";
 import DotLoaderSpinner from "@/components/loaders/dotLoader";
 import Router from "next/router";
@@ -26,8 +31,9 @@ const initialvalues = {
   conf_password: "",
   success: "",
   error: "",
+  login_error: "",
 };
-export default function signin({ providers }) {
+export default function signin({ providers, callbackUrl, csrfToken }) {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(initialvalues);
   const {
@@ -39,6 +45,7 @@ export default function signin({ providers }) {
     conf_password,
     success,
     error,
+    login_error,
   } = user;
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -82,20 +89,40 @@ export default function signin({ providers }) {
       });
       setUser({ ...user, error: "", success: data.message });
       setLoading(false);
-      setTimeout(() => {
+      setTimeout(async () => {
+        let options = {
+          redirect: false,
+          email: email,
+          password: password,
+        };
+        const res = await signIn("credentials", options);
         Router.push("/");
-      }, 2000)
+      }, 2000);
     } catch (error) {
       setLoading(false);
       setUser({ ...user, success: "", error: error.response.data.message });
     }
   };
-
+  const signInHander = async () => {
+    setLoading(true);
+    let options = {
+      redirect: false,
+      email: login_email,
+      password: login_password,
+    };
+    const res = await signIn("credentials", options);
+    setUser({ ...user, success: "", error: "" });
+    setLoading(false);
+    if (res?.error) {
+      setLoading(false);
+      setUser({ ...user, login_error: res?.error });
+    } else {
+      return Router.push(callbackUrl || "/");
+    }
+  };
   return (
     <>
-    {
-      loading && <DotLoaderSpinner loading={loading} />
-    }
+      {loading && <DotLoaderSpinner loading={loading} />}
       <Header country />
       <div className={styles.login}>
         <div className={styles.login__container}>
@@ -110,7 +137,7 @@ export default function signin({ providers }) {
           </div>
           <div className={styles.login__form}>
             <h1>Sign in</h1>
-            <p>Chào mừng đến với website E-commerce lớn nhất cả nước.</p>
+            <p>Chào mừng đến với website E-commerce của chúng tôi.</p>
             <Formik
               enableReinitialize
               initialValues={{
@@ -118,9 +145,15 @@ export default function signin({ providers }) {
                 login_password,
               }}
               validationSchema={loginValidation}
+              onSubmit={() => {
+                signInHander();
+              }}
             >
               {(form) => (
-                <Form>
+                <Form method="post" action="/api/auth/signin/email">
+                  <input type="hidden" name="csrfToken"
+                  defaultValue={csrfToken}
+                  />
                   <LoginInput
                     type="text"
                     name="login_email"
@@ -136,6 +169,9 @@ export default function signin({ providers }) {
                     onChange={handleChange}
                   />
                   <CircledIconBtn type="submit" text="Sign in" />
+                  {login_error && (
+                    <span className={styles.error}>{login_error}</span>
+                  )}
                   <div className={styles.forgot}>
                     <Link href="/forget">Forgot password ?</Link>
                   </div>
@@ -145,20 +181,25 @@ export default function signin({ providers }) {
             <div className={styles.login__socials}>
               <span className={styles.or}>Or continue with</span>
               <div className={styles.login__socials_wrap}>
-                {providers.map((provider) => (
-                  <div key={provider.name}>
-                    <button
-                      className={styles.socials__btn}
-                      onClick={() => signIn(provider.id)}
-                    >
-                      <img
-                        src={`../../images/icons/${provider.name}.png`}
-                        alt=""
-                      />
-                      Sign in with {provider.name}
-                    </button>
-                  </div>
-                ))}
+                {providers.map((provider) => {
+                  if (provider.name == "Credentials") {
+                    return;
+                  }
+                  return (
+                    <div key={provider.name}>
+                      <button
+                        className={styles.socials__btn}
+                        onClick={() => signIn(provider.id)}
+                      >
+                        <img
+                          src={`../../images/icons/${provider.name}.png`}
+                          alt=""
+                        />
+                        Sign in with {provider.name}
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -166,7 +207,7 @@ export default function signin({ providers }) {
         <div className={styles.login__container}>
           <div className={styles.login__form}>
             <h1>Sign up</h1>
-            <p>Chào mừng đến với website E-commerce lớn nhất cả nước.</p>
+            <p>Chào mừng đến với website E-commerce của chúng tôi.</p>
             <Formik
               enableReinitialize
               initialValues={{
@@ -214,7 +255,9 @@ export default function signin({ providers }) {
                 </Form>
               )}
             </Formik>
-            <div>{success && <span className={styles.success}>{success}</span>}</div>
+            <div>
+              {success && <span className={styles.success}>{success}</span>}
+            </div>
             <div>{error && <span className={styles.error}>{error}</span>}</div>
           </div>
         </div>
@@ -225,8 +268,19 @@ export default function signin({ providers }) {
 }
 
 export async function getServerSideProps(context) {
+  const { req, query } = context;
+  const { callbackUrl } = query;
+  const session = await getSession({ req });
+  if (session) {
+    return {
+      redirect: {
+        destination: callbackUrl,
+      },
+    };
+  }
+  const csrfToken = await getCsrfToken(context);
   const providers = Object.values(await getProviders());
   return {
-    props: { providers },
+    props: { providers, csrfToken, callbackUrl },
   };
 }
