@@ -73,11 +73,11 @@ export default function signin({ providers, callbackUrl, csrfToken }) {
       .required(
         "Nhập tổ hợp của ít nhất sáu số, chữ cái và dấu chấm câu (chẳng hạn như ! và &)."
       )
-      .min(6, "Password cần ít nhất 6 ký tự.")
-      .max(36, "Password không thể nhiều hơn 36 kí tự."),
+      .min(6, "Mật khẩu cần ít nhất 6 ký tự.")
+      .max(36, "Mật khẩu không thể nhiều hơn 36 kí tự."),
     conf_password: Yup.string()
-      .required("Nhập lại Password của bạn.")
-      .oneOf([Yup.ref("password")], "Password không phù hợp."),
+      .required("Nhập lại mật khẩu của bạn.")
+      .oneOf([Yup.ref("password")], "Mật khẩu không trùng khớp."),
   });
   const signUpHandler = async () => {
     try {
@@ -173,7 +173,7 @@ export default function signin({ providers, callbackUrl, csrfToken }) {
                     <span className={styles.error}>{login_error}</span>
                   )}
                   <div className={styles.forgot}>
-                    <Link href="/forget">Forgot password ?</Link>
+                    <Link href="/auth/forgot">Quên mật khẩu ?</Link>
                   </div>
                 </Form>
               )}

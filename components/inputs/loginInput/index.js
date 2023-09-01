@@ -8,7 +8,7 @@ import cartSlice from "@/store/cartSlice";
 import { Cagliostro } from "next/font/google";
 export default function index({ icon, placeholder, ...props }) {
   const [field, meta] = useField(props);
-  console.log(meta);
+  // console.log(meta);
   return (
     <div
       className={`${styles.input} ${
